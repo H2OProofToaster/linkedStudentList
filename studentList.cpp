@@ -3,27 +3,31 @@
 #include <vector>
 #include <iomanip>
 #include <limits>
+#include "Node.h"
+#include "student.h"
 
 using namespace std;
 
 //Student struct
-struct student
+/*struct student
 {
    char firstName[30];
    char lastName[30];
    int studentID;
    float GPA;
-};
+};*/
 
 //Prototypes
-void add(vector<student*> &vect);
-void printStudents(vector<student*> vect);
-void deleteStudent(vector<student*> &vect);
+void add(Node* &head); //Prompts user for student info and adds to head
+void insert(Node* &head, Student* s); //Takes created student pointer and adds to head
+void printStudents(Node* head);
+void deleteStudent(Node* &head);
 
 //Loops to run commands
 int main()
 {
-  vector<student*> studentList; //Vector of pointers to students structs
+  //vector<student*> studentList; //Vector of pointers to students structs
+  Node* head = nullptr;
   bool quit = false; //Flip to quit
   char actions[4][7] = {"ADD", "DELETE", "PRINT", "QUIT"}; //Allowed actions to do
 
@@ -60,6 +64,49 @@ int main()
     }
 }
 
+//Does not sort by GPA yet
+void add(Node* &head)
+{
+  //Get input
+  char firstName[30];
+  cout << "What is the first name of the student to add?" << &endl;
+  cin.ignore();
+  cin.get(firstName, 31);
+
+  char lastName[30];
+  cout << "What is the last name of the student to add?" << &endl;
+  cin.ignore();
+  cin.get(lastName, 31);
+
+  int studentID = 0;
+  cout << "What is the ID of the student to add?" << &endl;
+  cin >> studentID;
+  cin.ignore();
+
+  float GPA = 0.0;
+  cout << "What is the GPA of the student to add?" << &endl;
+  cin >> GPA;
+  cin.ignore();
+
+  //Make new student
+  Student* newS = new Student(firstName, lastName, studentID, GPA);
+
+  //Add to end of linked list
+  insert(head, newS);
+}
+
+void insert(Node* &head, Student* s)
+{
+  //End of list
+  if(head == nullptr)
+    { head = new Node(s); }
+
+  //Go to next node
+  else
+    { insert(head->getNext(), s); }
+}
+    
+/*
 void add(vector<student*> &vect)
 {
   //Get input
@@ -122,3 +169,4 @@ void deleteStudent(vector<student*> &vect)
 	}
     }
 }
+*/
