@@ -5,7 +5,7 @@ Student::Student(char* f, char* l, int i, float g)
 {
   setFirstName(f);
   setLastName(l);
-  setId(i);
+  setID(i);
   setGPA(g);
 }
 
