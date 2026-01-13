@@ -19,7 +19,7 @@ using namespace std;
 
 //Prototypes
 void add(Node* &head); //Prompts user for student info and adds to head
-void insert(Node* &head, Student* s); //Takes created student pointer and adds to head
+bool insert(Node* head, Student* s); //Takes created student pointer and adds to head
 void printStudents(Node* head);
 
 //Default parameter functions
@@ -129,17 +129,36 @@ void add(Node* &head)
   //Make new student
   Student* newS = new Student(firstName, lastName, studentID, GPA);
 
-  //Add to end of linked list
-  insert(head, newS);
+  if(head == nullptr) { head = new Node(newS); }
+
+  else
+    {
+      if(head->getStudent()->getID() > newS->getID())
+	{
+	  Node* temp = head;
+	  head = new Node(newS);
+	  head->setNext(temp);
+	}
+      else { insert(head, newS); }
+    }
 }
 
-void insert(Node* &head, Student* s)
-{
-  //End of list
-  if(head == nullptr) { head = new Node(s); }
-
-  //Go to next node
-  else { Node* temp = head->getNext(); insert(temp, s); }
+bool insert(Node* head, Student* s)
+{ 
+  if(head->getStudent()->getID() < s->getID())
+    {
+      Node* why = head->getNext();
+      if(insert(why, s))
+	{
+	  Node* temp = head->getNext();
+	  head->setNext(new Node(s));
+	  head->getNext()->setNext(temp);
+	}
+      else
+	{ return false; }
+    }
+  else
+    { return false; }
 }
 
 void printStudents(Node* head)
