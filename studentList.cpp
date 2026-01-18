@@ -21,76 +21,67 @@ using namespace std;
 void add(Node* &head); //Prompts user for student info and adds to head
 void insert(Node* &head, Student* s); //Takes created student pointer and adds to head
 void printStudents(Node* head);
-Node* deleteStudent(Node* head, int ID = -1);
-
+void deleteStudent(Node* &head, int ID = -1);
 float averageGPA(Node* head, float avg = 0.0f);
+void deleteAll(Node* &head);
 
 //Loops to run commands
 int main()
 {
-  //vector<student*> studentList; //Vector of pointers to students structs
   Node* head = nullptr;
   bool quit = false; //Flip to quit
   char actions[5][8] = {"ADD", "DELETE", "PRINT", "QUIT", "AVERAGE"}; //Allowed actions to do
-
-  //DEBUG
-  //int iterations = 0;
   
   //Loops and asks for actions each time
   while(!quit)
+  {
+    //Quit
+    if(quit) {return 0;}
+
+    //Get action
+    cout << "What is your action? (ADD, DELETE, PRINT, AVERAGE, or QUIT)" << &endl;
+    char action[8];
+    cin.get(action, 8);
+
+    if(strcmp(action, actions[0]) == 0)
+	  {
+	    add(head);
+	  }
+    else if(strcmp(action, actions[1]) == 0)
+	  {
+	    deleteStudent(head);
+	  }
+    else if(strcmp(action, actions[2]) == 0)
+	  {
+	    cout << "Students" << endl;
+	    printStudents(head);
+	    cin.ignore();
+	  }
+    else if(strcmp(action, actions[4]) == 0)
+	  {
+	    float out = averageGPA(head);
+	    if(out == -1.0f) { cout << "WHY ARE YOU AVERAGING AN EMPTY LIST" << endl; }
+	    else { cout << fixed << setprecision(2) << out << endl; }
+	    cin.ignore();
+	  }
+    else if(strcmp(action, actions[3]) == 0)
+	  {
+        deleteAll(head);
+	    quit = !quit;
+	  }
+    else
+	  {
+	    cout << "no action" << &endl;
+	  }
+
+    //Reset action
+    for(int i = 0; i++; i < strlen(action))
     {
-      //Quit
-      if(quit) {return 0;}
-  
-      //Get action
-      cout << "What is your action? (ADD, DELETE, PRINT, AVERAGE, or QUIT)" << &endl;
-      char action[8];
-      cin.get(action, 8);
-
-      //Print which action
-      //cout << "Debug; action: " << action << &endl;
-
-      if(strcmp(action, actions[0]) == 0)
-	{
-	  add(head);
-	}   
-      else if(strcmp(action, actions[1]) == 0)
-	{
-	  deleteStudent(head);
-	} 
-      else if(strcmp(action, actions[2]) == 0)
-	{
-	  cout << "Students" << endl;
-	  printStudents(head);
-	  cin.ignore();
-	} 
-      else if(strcmp(action, actions[4]) == 0)
-	{
-	  float out = averageGPA(head);
-	  if(out == -1.0f) { cout << "WHY ARE YOU AVERAGING AN EMPTY LIST" << endl; }
-	  else { cout << fixed << setprecision(2) << out << endl; }
-	  cin.ignore();
-	} 
-      else if(strcmp(action, actions[3]) == 0)
-	{
-	  quit = !quit;
-	} 
-      else
-	{
-	  cout << "no action" << &endl;
-	}
-      
-      //Reset action
-      for(int i = 0; i++; i < strlen(action))
-	{
-	  action[i] = '\0';
-	}
-      
-      //iterations++;
+      action[i] = '\0';
     }
+  }
 }
 
-//Does not sort by ID yet
 void add(Node* &head)
 {
   //Get input
@@ -123,19 +114,19 @@ void add(Node* &head)
 void insert(Node* &head, Student* s)
 {
   if(head == nullptr) //End of list
-    {
-      head = new Node(s);
-    }
+  {
+    head = new Node(s);
+  }
   else if(s->getID() < head->getStudent()->getID()) //Smaller than head
-    {
-      Node* temp = head;
-      head = new Node(s);
-      head->setNext(temp);
-    }
+  {
+    Node* temp = head;
+    head = new Node(s);
+    head->setNext(temp);
+  }
   else if(head->getNext() == nullptr) //Bigger than last in list
-    {
-      head->setNext(new Node(s));
-    }
+{
+  head->setNext(new Node(s));
+}
   else if(s->getID() < head->getNext()->getStudent()->getID()) //Smaller than the next one
     {
       Node* temp = new Node(s);
@@ -159,8 +150,7 @@ void printStudents(Node* head)
   printStudents(head->getNext());
 }     
 
-//Default parameter functions
-Node* deleteStudent(Node* head, int ID)
+void deleteStudent(Node* &head, int ID)
 {
   //Get ID first time
   if(ID == -1)
@@ -172,27 +162,39 @@ Node* deleteStudent(Node* head, int ID)
       ID = newID;
     }
 
-  //Catch end of list
-  if(head == nullptr) { cout << "End of list"; return nullptr; }
+  //One element list
+  if (head->getStudent()->getID() == ID && head->getNext() == nullptr) {
+      delete head;
+      head = nullptr;
+      return;
+  }
 
-  //Current node matches ID
-  if(head->getStudent()->getID() == ID) { cout << "found match"; return head->getNext(); } //Return node to delete's next node
-  
-  //Go to next
-  Node* newNext = deleteStudent(head, ID);
-  cout << "return" << newNext->getStudent()->getID();
-  
-  //Catch match
-  if(newNext != nullptr)
-    {
-      cout << "deleting";
-      delete head; //Delete match
-      head->setNext(newNext); //Fix next
-      return nullptr;
-    }
+  //First element match
+  if (head->getStudent()->getID() == ID) {
+      Node* temp = head;
+      head = head->getNext();
+      delete temp;
+      return;
+  }
+
+  //End of list
+  if (head->getNext()->getStudent()->getID() == ID && head->getNext()->getNext() == nullptr) {
+      delete head->getNext();
+      head->setNext(nullptr);
+      return;
+  }
+
+  //Next match
+  if (head->getNext()->getStudent()->getID() == ID) {
+      Node* temp = head->getNext()->getNext();
+      delete head->getNext();
+      head->setNext(temp);
+      return;
+  }
+
+  Node* temp = head->getNext();
+  deleteStudent(temp, ID);
 }
-
-Node*
 
 float averageGPA(Node* head, float avg)
 {
@@ -202,70 +204,15 @@ float averageGPA(Node* head, float avg)
   if(avg != head->getStudent()->getGPA()) { avg = avg / 2; }
 
   if(head->getNext() == nullptr) { return avg; }
-  else { averageGPA(head->getNext(), avg); }
+  return averageGPA(head->getNext(), avg);
 }
 
-/*
-void add(vector<student*> &vect)
-{
-  //Get input
-  char firstName[30];
-  cout << "What is the first name of the student to add?" << &endl;
-  cin.ignore();
-  cin.get(firstName, 31);
-
-  char lastName[30];
-  cout << "What is the last name of the student to add?" << &endl;
-  cin.ignore();
-  cin.get(lastName, 31);
-  
-  int studentID = 0;
-  cout << "What is the ID of the student to add?" << &endl;
-  cin >> studentID;
-  cin.ignore();
-  
-  float GPA = 0.0;
-  cout << "What is the GPA of the student to add?" << &endl;
-  cin >> GPA;
-  cin.ignore();
-
-  //Make struct
-  student* newStudent = new student;
-  strcpy((*newStudent).firstName, firstName);
-  strcpy((*newStudent).lastName, lastName);
-  (*newStudent).studentID = studentID;
-  (*newStudent).GPA = GPA;
-
-  //Add struct to vector
-  vect.push_back(newStudent);
-}
-
-void printStudents(vector<student*> vect)
-{
-  cout << "Students" << &endl;
-  for(int i = 0; i < vect.size(); i++)
-    {
-      cout << fixed << setprecision(2);
-      cout << (*vect[i]).firstName << " " << (*vect[i]).lastName << ", " << (*vect[i]).studentID << ", " << (*vect[i]).GPA << &endl;
+void deleteAll(Node* &head) {
+    if (head == nullptr) { return; }
+    if (head->getNext() == nullptr) {
+        delete head;
+        return;
     }
-  cin.ignore();
+    deleteAll(head);
+    delete head;
 }
-  
-void deleteStudent(vector<student*> &vect)
-{
-  int ID = 0;
-  cout << "What is the ID of the student to delete?" << &endl;
-  cin >> ID;
-  cin.ignore();
-  
-  for(int i = 0; i < vect.size(); i++)
-    {
-      if((*vect[i]).studentID == ID)
-	{
-	  delete vect[i];
-	  vect.erase(vect.begin() + i);
-	  return;
-	}
-    }
-}
-*/
